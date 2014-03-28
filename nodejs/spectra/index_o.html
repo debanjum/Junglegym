@@ -1,0 +1,93 @@
+<!DOCTYPE HTML>
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<title>Jungle Gym</title>
+		<meta name="author" content="D">
+		<meta name="description" content="Exploring Interactive Interfaces for the Web">
+		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+		<link href="/spectra/atom.xml" rel="alternate" title="Spectra" type="application/atom+xml">
+		<link rel="canonical" href="">
+		<link href="/spectra/favicon.png" rel="shortcut icon">
+		<link href="/spectra/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+		<!--[if lt IE 9]><script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+		<script async="true" src="//ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>         
+		<script type="text/javascript" src="http://192.168.0.100:7000/socket.io/socket.io.js"></script>    
+		<script>
+			socket.on( 'sff', function() {	} );
+
+			function initspec(start,stop) 
+			{	drawGraph();
+				socket.emit('initspec', start, stop );
+			}
+		</script>
+</head>
+
+<body>
+<nav id="main-nav"><ul class="main">
+</ul>
+</nav>
+<nav id="mobile-nav">
+	<div class="alignleft menu">
+		<a class="button">Menu</a>
+		<div class="container"><ul class="main">
+</ul>
+</div>
+	</div>
+	<div class="alignright search">
+		<a class="button"></a>
+		<div class="container">
+			<form action="http://google.com/search" method="get">
+				<input type="text" name="q" results="0">
+				<input type="hidden" name="q" value="site:192.168.0.100:7000/spectra">
+			</form>
+		</div>
+	</div>
+</nav>
+<nav id="sub-nav" class="alignright">
+	<div class="social">
+		<a class="github" href="https://github.com/debanjum/Spectroserver" title="GitHub">GitHub</a>
+		<a class="rss" href="/spectra/atom.xml" title="RSS">RSS</a>
+	</div>
+	
+	<form class="search" action="http://google.com/search" method="get">
+		<input class="alignright" type="text" name="q" results="0">
+		<input type="hidden" name="q" value="site:192.168.0.100:7000/spectra">
+	</form>
+	
+</nav>
+
+
+<h2><a>Vectors, Sockets & Flows</a></h2>
+
+</header>
+	<div id="content" class="inner">
+ 
+    <body>
+        <svg id="demo" xmlns="http://www.w3.org/2000/svg" version="1.1" width="200" height="200"></svg>
+        <script type="text/javascript" src="/spectra/javascripts/snap.svg-min.js"></script>
+		<script type="text/javascript">
+			var s = Snap("#svg");
+			// Lets create big circle in the middle:
+			var bigCircle = s.circle(150, 150, 100);
+			// By default its black, lets change its attributes
+			bigCircle.attr({
+				fill: "#bada55",
+				stroke: "#000",
+				strokeWidth: 5
+			});
+		</script>
+
+		</div>
+			<footer id="footer" class="inner">Copyright &copy; 2014  D
+			<span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+			</footer>
+			<script src="/spectra/javascripts/slash.js"></script>
+		<script src="/spectra/javascripts/jquery.fancybox.pack.js"></script>
+		<script type="text/javascript">
+			(function($){
+			$('.fancybox').fancybox();
+			})(jQuery);
+		</script> <!-- Delete or comment this line to disable Fancybox -->
+	</body>
+</html>

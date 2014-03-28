@@ -1,3 +1,20 @@
+1.5.0 / 2014-03-06 
+==================
+
+  * update to express 4x
+
+1.4.7 / 2014-03-06 
+==================
+
+  * allow redis url
+
+1.4.6 / 2013-11-13 
+==================
+
+  * lazy load redis. fixes #56 
+  * update redis to 0.9.0
+  * added Unit tests ready for travis
+  * added repository field to package.json
 
 1.4.5 / 2012-11-02 
 ==================

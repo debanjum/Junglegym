@@ -1,45 +1,18 @@
 {SerialPort}  =   require('serialport')
-fs 			      =   require 'fs'
-express 	    =   require 'express'
-io 			      =   require 'socket.io'
-http 		      =   require 'http'
-redis         =   require 'redis'
-redses        =   require('connect-redis')(express)
-client        =   redis.createClient #'/var/run/redis/redis.sock'
-mongoose      =   require 'mongoose'
-
-
-port 		      =   '/dev/ttyACM0'
+fs 		      =   require 'fs'
+express       =   require 'express'
+io 		      =   require 'socket.io'
+http 	      =   require 'http'
+sys 		  =   require 'sys'
+red 		  =   require 'node-red'
+dweetClient   =   require 'node-dweetio'
+port 		  =   '/dev/ttyACM1'
 serialport	  =   null
-debug		      =	  true
-ard_data	    =	  "$"
-scan	        =	  "$"
-resetspec	    =	  "$"
-
-# Connect to DB
-mongoose.connect('mongodb://localhost/spectra');
-db = mongoose.connection
-`db.on('error', console.error.bind(console, 'connection error:'));`
-`db.once('open', function callback () { console.log('Conntected To Mongo Database'); });`
-
-# Creating Schema
-SpectrumSchema = new mongoose.Schema(
-  spectrum_id: { type: Number, min: 0 }
-  wavelength: { type: Number, min: 0 }
-  intensity: { type: Number, min: 0 }
-  )
-
-# Creating Model 'Spectrum' with 'SpectrumSchema' Schema
-Spectrum = mongoose.model 'Spectrum', SpectrumSchema 
-
-# Creating Document with Model
-spectrum = new Spectrum
-
-# For Removing All Documents in Model
-#`Spectrum.remove(function (err, spectrum) { if (err) { return handleError(err); }  Spectrum.findById(spectrum._id, function (err, spectrum) { console.log(spectrum); }) })`
-
-# For Finding All Documents in Model
-# `Spectrum.find(function (err, spectrum) { if (err) { console.log(err); } else { console.log(spectrum); } })` # Mongoose Find 
+debug		  =	  true
+ard_data	  =	  "$"
+scan	      =	  "$"
+resetspec	  =	  "$"
+dweet         =   null
 
 # Server listens for get requests, socket.io communication at http port
 app = express()
@@ -49,22 +22,43 @@ io = io.listen server
 io.set 'log level', 3
 
 # Session configuration
-app.use express.static(__dirname + '/public')
+#app.use express.static(__dirname + '/spectra')
+app.use("/",express.static(__dirname + '/spectra'))
+
 app.use express.cookieParser()
-#app.use express.session {secret: "CoffeeSpectrum", store: new redses({client: client, db: 2}), cookie: { maxAge: 60000 } }
-#app.use express.session {secret: "CoffeeSpectrum", cookie: { maxAge: 60000 } }
 app.set 'view engine', 'jade'
 
 # Routes
 app.get '/', (req, res) ->
-    res.sendfile __dirname + '/public/client.html'
-    req.session.views++ #Sessions Counter [testing]
+    res.sendfile __dirname + '/spectra/index.html'
+    req.session.views++
+
+app.get '/spectra/stylesheets/screen.css', (req, res) ->
+    res.sendfile __dirname + '/spectra/stylesheets/screen.css'
     
-app.get '/libraries/RGraph.line.js', (req, res) ->
-    res.sendfile __dirname + '/libraries/RGraph.line.js'
+app.get '/spectra/favicon.png', (req, res) ->
+    res.sendfile __dirname + '/spectra/favicon.png'
+
+app.get '/spectra/javascripts/snap.svg-min.js', (req, res) ->
+	res.sendfile __dirname + '/spectra/javascripts/snap.svg-min.js'
+	
+app.get '/spectra/javascripts/jquery.fancybox.pack.js', (req, res) ->
+    res.sendfile __dirname + '/spectra/javascripts/jquery.fancybox.pack.js'
     
-app.get '/libraries/RGraph.common.core.js', (req, res) ->
-    res.sendfile __dirname + '/libraries/RGraph.common.core.js'
+app.get '/spectra/images/social/github.png', (req, res) ->
+    res.sendfile __dirname + '/spectra/images/social/github.png'
+
+app.get '/spectra/images/social/rss.png', (req, res) ->
+    res.sendfile __dirname + '/spectra/images/social/rss.png'
+
+app.get '/spectra/font/fontawesome-webfont.ttf', (req, res) ->
+    res.sendfile __dirname + '/spectra/font/fontawesome-webfont.ttf'
+    
+app.get '/spectra/atom.xml', (req, res) ->
+    res.sendfile __dirname + '/spectra/atom.xml'
+    
+app.get '/spectra/images/test.svg', (req, res) ->
+    res.sendfile __dirname + '/spectra/images/test.svg'
     
 # Socket Signal
 io.sockets.on 'connection', (socket) ->
@@ -73,7 +67,7 @@ io.sockets.on 'connection', (socket) ->
 		
 	socket.on 'disconnect', ->
 		if debug is true then console.log 'Disconnected'
-		
+
 	socket.on 'initspec', (startwave,stopwave) ->
 		ard_data = "#0!" + startwave + stopwave + "."
 		if debug is true then console.log startwave, stopwave, ard_data
@@ -88,41 +82,9 @@ io.sockets.on 'connection', (socket) ->
 		resetspec = "#2!."
 		if debug is true then console.log resetspec
 		if sf is true then serialport.write resetspec else socket.emit 'sff'
+			
+#----------------------------Serial Data-------------------------------#
 
-	socket.on 'savespec', (startwave,stopwave,spectra) ->
-		savespec = "#3!."
-		if debug is true then console.log startwave,stopwave
-		start = parseInt startwave
-		stop = parseInt stopwave
-		spectrum_id= parseInt Date.now()			#Get Spectra Set Identifier
-		
-		# Storing Spectra in Database
-		for wavelength in [start..stop] by 5
-			i = 999 - (stopwave - wavelength)
-			spectrum = new Spectrum					# Creating Document 'spectrum' from Model 'Spectrum'
-			spectrum.spectrum_id = spectrum_id		# Spectrum Set Identifier
-			spectrum.wavelength = wavelength
-			spectrum.intensity = spectra[i]
-			`spectrum.save(function (err, spectrum) { if (err) { console.log(err); } })`	# Save Spectra Document to MongoDB
-	
-		# For Finding All Documents in Model
-		`Spectrum.find(function (err, spectrum) { if (err) { console.log(err); } else { console.log(spectrum); } })` # Mongoose Find
-		
-	socket.on 'openspec', (openw) ->
-		openspec = "#4!."
-		if debug is true then console.log openspec
-		`Spectrum.find({ 'spectrum_id': openw }, 'wavelength intensity', function (err, spectrum) 
-		{
-		 if (err) return handleError(err); 
-		 console.log(spectrum[0].wavelength, spectrum[0].intensity)
-		 for(i=0; i<spectrum.length; i++)
-		 {
-		 	socket.emit('data', spectrum[i].intensity);
-			console.log('Message : ' + spectrum[i].intensity);
-		 }})`
-		
-			
-			
 cleanData = '' # this stores the clean data
 readData = ''  # this stores the buffer
 sf = false     # flag to write to serialport, for communicating with arduino, ...
@@ -134,7 +96,7 @@ console.log "Starting..."
 fs.stat port, (err, stats) ->
 	if err?
 		console.log "Couldn't stat #{port}"
-		process.exit()
+	#	process.exit()
 	
 	# Opening serial port
 	console.log "Started."
@@ -158,3 +120,13 @@ fs.stat port, (err, stats) ->
 			if debug is true then console.log 'Message : ' + cleanData
 		
 		cleanData = ''
+
+#----------------------------TCP/IP Data-------------------------------#
+# Dweet Setup
+dweetio = new dweetClient
+
+dweetio.listen_for "d2dweath", (dweet) ->
+    socket.emit 'hour', dweet.content
+	console.log dweet.content
+
+

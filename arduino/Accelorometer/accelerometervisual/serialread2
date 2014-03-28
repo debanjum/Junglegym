@@ -1,0 +1,65 @@
+#!/usr/bin/env python2
+
+#Importing required modules
+try:
+	from gi.repository import Gtk
+        import serial  
+        import os
+except:
+	print('Missing Libraries')
+        exit(1)
+
+
+class SerialRead
+	#Constructor
+	def __init__(self,wincontrol=None):
+                # Called from Parent Script
+                if wincontrol is None:
+                        self.builder = Gtk.Builder()
+                        os.chdir("../../")
+                        self.builder.add_from_file("./UserInterface/calibratewindow.ui")
+                        self.builder.connect_signals(self)
+		
+                        self.calibratebutton = self.builder.get_object("calibratebutton")
+                        self.calibrationbar = self.builder.get_object("calibrationbar")
+                        self.calibrationbartext = self.builder.get_object("calibrationbartext")
+                        self.rightarrowbutton = self.builder.get_object("rightarrow")
+                        self.leftarrowbutton = self.builder.get_object("leftarrow")
+
+                        self.calibratewindow = self.builder.get_object("calibratewindow")
+                        self.calibratewindow.set_title("Spectroscopy")
+                        self.calibratewindow.show()
+
+                        #Initialising Control Directory
+                        f = open('./Data/wincontrol.dat', 'r+')
+                        f.write('0')
+
+                        self.wincontrol = f.read()
+                        f.close()
+
+                else:
+                        self.builder = Gtk.Builder()
+                        self.builder.add_from_file("./UserInterface/calibratewindow.ui")
+                        self.builder.connect_signals(self)
+		
+                        self.calibratebutton = self.builder.get_object("calibratebutton")
+                        self.calibrationbar = self.builder.get_object("calibrationbar")
+                        self.calibrationbartext = self.builder.get_object("calibrationbartext")
+                        self.rightarrowbutton = self.builder.get_object("rightarrow")
+                        self.leftarrowbutton = self.builder.get_object("leftarrow")
+                        
+                        self.calibratewindow = self.builder.get_object("calibratewindow")
+                        self.calibratewindow.set_title("Spectroscopy")
+                        
+                        #Window Controls
+                        self.wincontrol = wincontrol
+                        if self.wincontrol == 0:
+                                self.calibratewindow.show()
+                        else:
+                                self.calibratewindow.hide()
+	#Main Quit
+	def on_calibratewindow_delete_event(self, *args):
+        	Gtk.main_quit(*args)
+
+	#Execute Controls
+	def on_calibratebutton_pressed(self, calibratebutton):

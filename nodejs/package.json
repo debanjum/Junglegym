@@ -6,12 +6,14 @@
   "dependencies": {
     "mongodb": "latest",
     "mongoose": "latest",
-    "hiredis":"latest",
-    "redis":"latest",
+    "hiredis": "latest",
+    "redis": "latest",
     "connect-redis": "latest",
     "express": "3.4.0",
     "socket.io": "0.9.16",
     "toobusy": "latest",
-    "serialport": "latest"
+    "serialport": "latest",
+    "node-red": "latest",
+    "node-dweetio": "0.0.9"
   }
 }
