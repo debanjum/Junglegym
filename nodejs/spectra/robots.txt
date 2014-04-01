@@ -1,4 +1,0 @@
-User-agent: *
-Disallow: 
-
-Sitemap: http://172.16.5.14/spectra/sitemap.xml 
