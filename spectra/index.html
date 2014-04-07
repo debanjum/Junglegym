@@ -14,6 +14,12 @@
 		<link href="/spectra/atom.xml" rel="alternate" title="Junglegym" type="application/atom+xml">
 		<link href="/spectra/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
 		<!--[if lt IE 9]><script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script><![endif]-->
+<!--		<script src="http://d3js.org/d3.v3.min.js"></script>
+		<script src="http://d3js.org/queue.v1.min.js"></script> -->
+		<script src="/spectra/javascripts/libs/jquery.min.js"></script>
+		<script src="/spectra/javascripts/snap.svg-min.js"></script>
+		<script src="/spectra/javascripts/dweet.io.min.js"></script>
+		<script type="text/javascript" src="http://localhost:7000/socket.io/socket.io.js"></script>    
     </head>
 <!-----------------------------PAGE TITLE------------------------------>
     <body>
@@ -57,12 +63,8 @@
 		<div class='maze'>
 			<div class='walker'></div> <!--&#9654=Traingle,&#9730=Umbrella,&#9760=Skull,&#977*=ReligiousSymbols-->
 			<div class='cloud1'></div>
+			<script src='/spectra/javascripts/pathAnimator.js'></script>
 		</div>
-		<script src="/spectra/javascripts/libs/jquery.min.js"></script>
-		<script src="/spectra/javascripts/snap.svg-min.js"></script>
-		<script src="/spectra/javascripts/dweet.io.min.js"></script>
-		<script type="text/javascript" src="http://localhost:7000/socket.io/socket.io.js"></script>    
-		<script src='/spectra/javascripts/pathAnimator.js'></script>
 		
 		<div id="content" class="inner">
 		<div role="main">
@@ -76,65 +78,17 @@
 					stroke: 'black',
 					strokeWidth: 5
 				});
-			    /*
-			    circle.hover(function () {
-					this.animate({
-						fill: 'hotpink'
-					}, 300);
-				}, function () {
-					this.animate({
-						fill: 'silver'
-					}, 300);
-				});
-				*/
-				circle.click(function () {
-					this.animate({
-						r: 0,
-						x: 20,
-						y: 20
-					}, 300);
-				});
 				
 				function drawGraph()
-				{
-					socket.on ('hour', function (msg) //Connects to Node Data Server
-					{
-						//var weather = JSON.parse(msg);
-						var VALUE = parseInt(msg.hour);	// Convert message to float
-
-						var SPAN  = document.getElementById('sensorvalue');
-						   
-						var text = document.createTextNode(VALUE);
-							 
-						if(SPAN.childNodes.length == 0) {	SPAN.appendChild(text) }
-						else {	SPAN.firstChild.nodeValue = VALUE; }
-						 
-						circle.animate({r: VALUE, x: 20, y: 30}, 300);
-						circle.attr({fill: 'silver', stroke: 'black', strokeWidth: parseInt(VALUE)});
-					});	
-						circle.animate({r: 10, x: 10, y: 30}, 300);
-						circle.attr({fill: 'silver', stroke: 'black', strokeWidth: parseInt(10)});
+				{socket.on ('hour', function (msg) //Connects to Node Data Server
+				 {circle.animate({r: parseInt(msg.hour), x: 20, y: 30}, 300);	circle.attr({fill: 'silver', stroke: 'black', strokeWidth: parseInt(msg.hour)});});	
+				 circle.animate({r: 10, x: 10, y: 30}, 300);	circle.attr({fill: 'silver', stroke: 'black', strokeWidth: parseInt(10)});
 				}
 				
 				drawGraph();
-				//circle.hover(function () {this.animate({r: 0, x: 200, y: 200}, 300);}, function () {this.animate({r: 80, x: 100, y: 100}, 300);});
-
-				/*
-				circle.hover(function () {
-					socket.emit('hover'); 
-					socket.on('radius', function(radius) {this.animate({r: 20, x: 200, y: 200}, 300);});
-						}, function () {
-					this.animate({r: 80, x: 100, y: 100}, 300);
-				});
-				*/
-			
 			</script>
 		</div>
-			<div role="main">
-               Analog Out: <span id="sensorvalue"></span>
-           </div>
 		</div>
-			
 		</body>
 
 <!-----------------------------FOOTER---------------------------------->

@@ -79,11 +79,12 @@ PathAnimator.prototype = {
 -----------------------------------------------------------*/
 (function(){
 	var path = "M -95.158512,207.96048 C 481.88598,-274.94278 975.05353,205.94423 975.74495,206.62023",
-		cloud = "M -95.158512,207.96048 C 481.88598,-274.94278 975.05353,205.94423 975.74495,206.62023",
+		cloudpath = "M -155.158512,207.96048 C 0.88598,0.94278 0.05353,205.94423 975.74495,206.62023",
 		firstWalkerObj = $('.maze > .walker')[0],
 		firstCloudObj = $('.maze > .cloud1')[0],
 		walkers = [];
-		offset=0;	
+		offset=0;
+		windspeed=0;
 	
 	// handles whatever moves along the path
 	function AnimateWalker(walker){
@@ -144,15 +145,9 @@ PathAnimator.prototype = {
 
 	AnimateCloud.prototype = {
 		start : function(){
-			//this.walker.style.cssText = "";
-			//var socket = io.connect('http://localhost:7000');
-			//offset = 0;
-			dweetio.get_latest_dweet_for("d2dweath", function(err, dweet){ offset = parseInt((dweet[0].content.hour)*100/24); });
-			//socket.on ('hour', function (msg) { offset = parseInt((msg.hour)*100/24); console.log(offset)});
-			//$.when(dweetio.get_latest_dweet_for("d2dweath", function(err, dweet){ offset = parseInt((dweet[0].content.hour)*100/24); })).then(console.log(offset));
-			//function checkOffset(){ if (offset==0){ setTimeout(checkOffset,100); return; } console.log(offset); return;};
-			if (offset==0) { this.speed=1;} else { this.speed = 300; }
-			this.startOffset = (this.reverse || this.speed < 0) ? 100 - offset : 0 + offset; // if in reversed mode, then animation should start from the end, I.E 100%
+			dweetio.get_latest_dweet_for("d2dweatws", function(err, dweet){ windspeed = parseInt(324/(dweet[0].content.windspeed)); });  //Get Windspeed Dweet [windspeed & speed inversely correlated]
+			if (windspeed==0) { this.speed=1;} else { this.speed = windspeed; }	//Set Speed of cloud using Windspeed 
+			this.startOffset = (this.reverse || this.speed < 0) ? 100 : 0 ; // if in reversed mode, then animation should start from the end, I.E 100%
 			this.pathAnimator.context = this; // just a hack to pass the context of every Walker inside it's pathAnimator
 			this.pathAnimator.start( this.speed, this.step, this.reverse, this.startOffset, this.finish, this.easing);
 		},
